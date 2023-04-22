@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bf4ojm2q88aib"]
+
+[ext_resource type="Texture2D" uid="uid://b3dvb1qxv1g4a" path="res://assets/BlockColor2.png" id="1_3kqnf"]
+[ext_resource type="Script" path="res://Block.gd" id="2_0q17t"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Block" type="Sprite2D" parent="."]
+texture = ExtResource("1_3kqnf")
+centered = false
+script = ExtResource("2_0q17t")
