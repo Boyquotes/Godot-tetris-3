@@ -59,7 +59,7 @@ func new_move():
 
 func _on_timer_timeout():			
 	if blocks == [0, 0, 0, 0]:		
-		blocks_relative_coords = tetromino_coords[new_tetromino()]	
+		blocks_relative_coords = tetromino_coords[new_tetromino()].duplicate()
 		for i in 4:
 			blocks[i] = block.instantiate()
 			$Panel/Field.add_child(blocks[i])
