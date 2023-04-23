@@ -1,11 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bf4ojm2q88aib"]
+[gd_scene load_steps=2 format=3 uid="uid://wsq6o2tguo1k"]
 
-[ext_resource type="Texture2D" uid="uid://b3dvb1qxv1g4a" path="res://assets/BlockColor2.png" id="1_3kqnf"]
-[ext_resource type="Script" path="res://Block.gd" id="2_0q17t"]
+[ext_resource type="Texture2D" uid="uid://2v8j6xcad4kn" path="res://assets/BlockColorWhite.png" id="1_s3rq1"]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="Block" type="Sprite2D" parent="."]
-texture = ExtResource("1_3kqnf")
+texture = ExtResource("1_s3rq1")
 centered = false
-script = ExtResource("2_0q17t")

@@ -2,24 +2,21 @@ extends Node2D
 
 @onready var block = preload("res://Block.tscn")
 
-const cell_size = 64
-const width = 9
-const height = 20
-const bottom_border = cell_size * height
-const left_border = 0
-const right_border = cell_size * width
-const matrix_center = cell_size * (width / 2)
-const speed_factor = 0.97
+var cell_size = 64
+var bottom_border = 1280
+var left_border = 0
+var right_border = 576
+var matrix_center = 256
+var speed_factor = 0.97
 
-const block_I = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(cell_size, 0),Vector2(cell_size*2, 0)];
-const block_O = [Vector2(0, -cell_size),Vector2(cell_size, -cell_size),Vector2(cell_size, 0),Vector2(0, 0)];
-const block_J = [Vector2(-cell_size, -cell_size),Vector2(-cell_size, 0),Vector2(0, 0),Vector2(cell_size, 0)]
-const block_L = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(64, 0),Vector2(cell_size, -cell_size)]
-const block_T = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(0, -cell_size),Vector2(cell_size, 0)]
-const block_S = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(0, -cell_size),Vector2(cell_size, -cell_size)]
-const block_Z = [Vector2(-cell_size, -cell_size),Vector2(0, -cell_size),Vector2(0, 0),Vector2(cell_size, 0)];
-
-const tetromino_coords = [ block_I, block_O, block_J, block_L, block_T, block_S, block_Z ];
+# I, O, J, L, T, S, Z
+var tetromino_coords = [	[Vector2(-64, 0),Vector2(0, 0),Vector2(64, 0),Vector2(128, 0)],
+							[Vector2(0, -64),Vector2(64, -64),Vector2(64, 0),Vector2(0, 0)],
+							[Vector2(-64, -64),Vector2(-64, 0),Vector2(0, 0),Vector2(64, 0)],
+							[Vector2(-64, 0),Vector2(0, 0),Vector2(64, 0),Vector2(64, -64)],
+							[Vector2(-64, 0),Vector2(0, 0),Vector2(0, -64),Vector2(64, 0)],
+							[Vector2(-64, 0),Vector2(0, 0),Vector2(0, -64),Vector2(64, -64)],
+							[Vector2(-64, -64),Vector2(0, -64),Vector2(0, 0),Vector2(64, 0)]]
 
 var matrix_coords = Vector2(matrix_center, cell_size)
 var blocks_relative_coords = []
@@ -42,18 +39,18 @@ func restart_game():
 	fallen_blocks_coords = []
 	next_tetromino = new_tetromino()
 	points = 0
-	$Panel/Points_lable.text = str(points)
+	$Main_panel/Points_lable.text = "Points: " + str(points)
 	$Timer.wait_time = 1;
 	$Timer.start()
-	$Panel/Speed_lable.text = str($Timer.wait_time)
+	$Main_panel/Speed_lable.text = "Speed: " + str(round($Timer.wait_time))
 	new_move()
-	$Panel/Game_over_lable.visible = false
-	$Panel/Start_button.text = "Restart"
+	$Main_panel/Game_over_panel.visible = false
+	$Main_panel/Start_button.text = "Restart"
 
 func check_game_over():
 	for i in fallen_blocks:
 		if i.position.y == cell_size:
-			$Panel/Game_over_lable.visible = true
+			$Main_panel/Game_over_panel.visible = true
 			$Timer.stop()
 
 func new_move():
@@ -65,7 +62,7 @@ func _on_timer_timeout():
 		blocks_relative_coords = tetromino_coords[new_tetromino()].duplicate()
 		for i in 4:
 			blocks[i] = block.instantiate()
-			$Panel/Field.add_child(blocks[i])
+			$Main_panel/Field.add_child(blocks[i])
 		update_coords()
 	else:
 		move_down()
@@ -76,7 +73,7 @@ func new_tetromino():
 		if new_tetromino != next_tetromino:
 			var present_tetromino = next_tetromino
 			next_tetromino = new_tetromino
-			$Panel/Next_tetromino_texture.texture = load("res://assets/Tetromino%d.png" % next_tetromino)
+			$Main_panel/Next_tetromino_texture.texture = load("res://assets/Tetromino%d.png" % next_tetromino)
 			return present_tetromino
 
 func update_coords():
@@ -88,11 +85,11 @@ func add_points(number_full_lines):
 	for i in number_full_lines:
 		new_points = new_points * 2 + 100
 	points += new_points
-	$Panel/Points_lable.text = str(points)
+	$Main_panel/Points_lable.text = "Points: " + str(points)
 
 func change_speed(number_full_lines):
 	$Timer.wait_time = $Timer.wait_time * (speed_factor ** number_full_lines)
-	$Panel/Speed_lable.text = str($Timer.wait_time)
+	$Main_panel/Speed_lable.text = "Speed: " + str(round($Timer.wait_time))
 
 func check_lines():
 	var new_dropped_blocks_coords_y = []
@@ -206,5 +203,22 @@ func _input(event):
 		if Input.is_action_just_pressed("turn"):
 			turn()
 
+func _on_down_button_pressed():
+	if  blocks != [0, 0, 0, 0]:
+		move_down()
+
+func _on_right_button_pressed():
+	if  blocks != [0, 0, 0, 0]:
+		move_right()
+
+func _on_turn_button_pressed():
+	if  blocks != [0, 0, 0, 0]:
+		turn()
+
+func _on_left_button_pressed():
+	if  blocks != [0, 0, 0, 0]:
+		move_left()
+
 func _on_button_pressed():
 	restart_game()
+

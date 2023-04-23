@@ -8,58 +8,110 @@ script = ExtResource("1_p8eam")
 
 [node name="Timer" type="Timer" parent="."]
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Main_panel" type="Panel" parent="."]
 offset_top = 1.0
 offset_right = 500.0
 offset_bottom = 800.0
 
-[node name="Start_button" type="Button" parent="Panel"]
+[node name="Start_button" type="Button" parent="Main_panel"]
 layout_mode = 0
-offset_left = 89.0
-offset_top = 725.0
-offset_right = 153.0
-offset_bottom = 789.0
+offset_left = 26.0
+offset_top = 726.0
+offset_right = 90.0
+offset_bottom = 790.0
 text = "Start"
 
-[node name="Next_tetromino_texture" type="TextureRect" parent="Panel"]
+[node name="Next_tetromino_texture" type="TextureRect" parent="Main_panel"]
 layout_mode = 0
-offset_left = 217.0
-offset_top = 8.0
-offset_right = 282.0
-offset_bottom = 73.0
+offset_left = 186.0
+offset_top = 16.0
+offset_right = 250.0
+offset_bottom = 80.0
 expand_mode = 1
 
-[node name="Points_lable" type="Label" parent="Panel"]
+[node name="Points_lable" type="Label" parent="Main_panel"]
 layout_mode = 0
-offset_left = 305.0
-offset_top = 28.0
-offset_right = 369.0
-offset_bottom = 54.0
+offset_left = 282.0
+offset_top = 48.0
+offset_right = 346.0
+offset_bottom = 80.0
 
-[node name="Game_over_lable" type="Label" parent="Panel"]
+[node name="Field" type="Sprite2D" parent="Main_panel"]
+position = Vector2(90, 80)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_ij3jd")
+centered = false
+
+[node name="Speed_lable" type="Label" parent="Main_panel"]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 48.0
+offset_right = 154.0
+offset_bottom = 80.0
+
+[node name="Keys_lable" type="Label" parent="Main_panel"]
+layout_mode = 0
+offset_top = 80.0
+offset_right = 90.0
+offset_bottom = 208.0
+text = " Left - A
+ Turn - W
+ Right - D
+ Down - S"
+
+[node name="Game_over_panel" type="Panel" parent="Main_panel"]
 visible = false
 layout_mode = 0
-offset_left = 144.0
-offset_top = 708.0
-offset_right = 357.0
-offset_bottom = 813.0
+offset_left = 154.0
+offset_top = 336.0
+offset_right = 346.0
+offset_bottom = 464.0
+
+[node name="Game_over_lable" type="Label" parent="Main_panel/Game_over_panel"]
+layout_mode = 0
+offset_right = 192.0
+offset_bottom = 128.0
 theme_type_variation = &"HeaderLarge"
 text = "GAME OVER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Field" type="Sprite2D" parent="Panel"]
-position = Vector2(90, 79)
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("1_ij3jd")
-centered = false
-
-[node name="Speed_lable" type="Label" parent="Panel"]
+[node name="Left_button" type="Button" parent="Main_panel"]
 layout_mode = 0
-offset_left = 102.0
-offset_top = 24.0
-offset_right = 189.0
-offset_bottom = 57.0
+offset_left = 122.0
+offset_top = 726.0
+offset_right = 186.0
+offset_bottom = 790.0
+text = "Left
+"
+
+[node name="Right_button" type="Button" parent="Main_panel"]
+layout_mode = 0
+offset_left = 314.0
+offset_top = 726.0
+offset_right = 378.0
+offset_bottom = 790.0
+text = "Right"
+
+[node name="Turn_button" type="Button" parent="Main_panel"]
+layout_mode = 0
+offset_left = 218.0
+offset_top = 726.0
+offset_right = 282.0
+offset_bottom = 790.0
+text = "Turn"
+
+[node name="Down_button" type="Button" parent="Main_panel"]
+layout_mode = 0
+offset_left = 410.0
+offset_top = 726.0
+offset_right = 474.0
+offset_bottom = 790.0
+text = "Down"
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
-[connection signal="pressed" from="Panel/Start_button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="Main_panel/Start_button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="Main_panel/Left_button" to="." method="_on_left_button_pressed"]
+[connection signal="pressed" from="Main_panel/Right_button" to="." method="_on_right_button_pressed"]
+[connection signal="pressed" from="Main_panel/Turn_button" to="." method="_on_turn_button_pressed"]
+[connection signal="pressed" from="Main_panel/Down_button" to="." method="_on_down_button_pressed"]
