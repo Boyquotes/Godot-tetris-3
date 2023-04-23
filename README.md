@@ -1,5 +1,5 @@
 # Godot-tetris
-Tetris clone that I made with Godot.
+Tetris clone that I made with GDScript.
 
 ## Overview
 ![Interface](docs/Tetris_screenshot.png)
