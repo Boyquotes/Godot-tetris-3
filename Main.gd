@@ -2,21 +2,24 @@ extends Node2D
 
 @onready var block = preload("res://Block.tscn")
 
-var cell_size = 64
-var bottom_border = 1280
-var left_border = 0
-var right_border = 576
-var matrix_center = 256
-var speed_factor = 0.97
+const cell_size = 64
+const width = 9
+const height = 20
+const bottom_border = cell_size * height
+const left_border = 0
+const right_border = cell_size * width
+const matrix_center = cell_size * (width / 2)
+const speed_factor = 0.97
 
-# I, O, J, L, T, S, Z
-var tetromino_coords = [	[Vector2(-64, 0),Vector2(0, 0),Vector2(64, 0),Vector2(128, 0)],
-							[Vector2(0, -64),Vector2(64, -64),Vector2(64, 0),Vector2(0, 0)],
-							[Vector2(-64, -64),Vector2(-64, 0),Vector2(0, 0),Vector2(64, 0)],
-							[Vector2(-64, 0),Vector2(0, 0),Vector2(64, 0),Vector2(64, -64)],
-							[Vector2(-64, 0),Vector2(0, 0),Vector2(0, -64),Vector2(64, 0)],
-							[Vector2(-64, 0),Vector2(0, 0),Vector2(0, -64),Vector2(64, -64)],
-							[Vector2(-64, -64),Vector2(0, -64),Vector2(0, 0),Vector2(64, 0)]]
+const block_I = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(cell_size, 0),Vector2(cell_size*2, 0)];
+const block_O = [Vector2(0, -cell_size),Vector2(cell_size, -cell_size),Vector2(cell_size, 0),Vector2(0, 0)];
+const block_J = [Vector2(-cell_size, -cell_size),Vector2(-cell_size, 0),Vector2(0, 0),Vector2(cell_size, 0)]
+const block_L = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(64, 0),Vector2(cell_size, -cell_size)]
+const block_T = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(0, -cell_size),Vector2(cell_size, 0)]
+const block_S = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(0, -cell_size),Vector2(cell_size, -cell_size)]
+const block_Z = [Vector2(-cell_size, -cell_size),Vector2(0, -cell_size),Vector2(0, 0),Vector2(cell_size, 0)];
+
+const tetromino_coords = [ block_I, block_O, block_J, block_L, block_T, block_S, block_Z ];
 
 var matrix_coords = Vector2(matrix_center, cell_size)
 var blocks_relative_coords = []
