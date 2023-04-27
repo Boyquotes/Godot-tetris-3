@@ -2,226 +2,436 @@ extends Node2D
 
 @onready var block = preload("res://Block.tscn")
 
+const game_field_width = 10
+const game_field_height = 20
+
 const cell_size = 64
-const width = 9
-const height = 20
-const bottom_border = cell_size * height
-const left_border = 0
-const right_border = cell_size * width
-const matrix_center = cell_size * (width / 2)
-const speed_factor = 0.97
 
-const block_I = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(cell_size, 0),Vector2(cell_size*2, 0)];
-const block_O = [Vector2(0, -cell_size),Vector2(cell_size, -cell_size),Vector2(cell_size, 0),Vector2(0, 0)];
-const block_J = [Vector2(-cell_size, -cell_size),Vector2(-cell_size, 0),Vector2(0, 0),Vector2(cell_size, 0)]
-const block_L = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(64, 0),Vector2(cell_size, -cell_size)]
-const block_T = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(0, -cell_size),Vector2(cell_size, 0)]
-const block_S = [Vector2(-cell_size, 0),Vector2(0, 0),Vector2(0, -cell_size),Vector2(cell_size, -cell_size)]
-const block_Z = [Vector2(-cell_size, -cell_size),Vector2(0, -cell_size),Vector2(0, 0),Vector2(cell_size, 0)];
+const left_border = -cell_size * game_field_width / 2
+const right_border = cell_size * (game_field_width / 2 - 1)
+const bottom_border = cell_size * (game_field_height / 2 - 1)
+const matrix_center = Vector2(-cell_size, -cell_size * (game_field_height / 2))
 
-const tetromino_coords = [ block_I, block_O, block_J, block_L, block_T, block_S, block_Z ];
+const tetromino_I = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size * 2, 0)]
+const tetromino_O = [Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size), Vector2(0, cell_size)]
+const tetromino_T = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, 0)]
+const tetromino_L = [Vector2(-cell_size, cell_size), Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0)]
+const tetromino_J = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size)]
+const tetromino_S = [Vector2(-cell_size, cell_size), Vector2(0, cell_size), Vector2(0, 0), Vector2(cell_size, 0)]
+const tetromino_Z = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, cell_size)]
+const tetromino_coords = [tetromino_I, tetromino_O, tetromino_T, tetromino_L, tetromino_J, tetromino_S, tetromino_Z]
 
-var matrix_coords = Vector2(matrix_center, cell_size)
-var blocks_relative_coords = []
+const speed_multiplier = 0.95
+const max_speed = 0.01
+const pressed_timer_speed = 0.01
+const max_pressed_ticks = 30
 
-var next_tetromino = randi_range(0, len(tetromino_coords) - 1)
+var left_button_pressed
+var left_button_pressed_ticks
+var down_button_pressed
+var down_button_pressed_ticks
+var right_button_pressed
+var right_button_pressed_ticks
 
-var blocks = [0, 0, 0, 0]
-var fallen_blocks = []
-var fallen_blocks_coords = []
+var speed
+var no_pause
 
-var points = 0
+var points
 
-func restart_game():
-	if blocks != [0, 0, 0, 0]:
-		for i in blocks:
-			i.queue_free()
-	for i in fallen_blocks:
-		i.queue_free()
+var matrix_coords
+var blocks
+var blocks_relative_coords
+var fallen_blocks
+var fallen_blocks_coords
+
+var next_tetromino
+
+func _on_ready():
+	speed = 1
+	no_pause = false
+
+	$GameTimer.wait_time = speed
+	$PressedTimer.wait_time = pressed_timer_speed
+
+	points = 0
+
+	matrix_coords = matrix_center
+	blocks = []
+	blocks_relative_coords = []
 	fallen_blocks = []
 	fallen_blocks_coords = []
-	next_tetromino = new_tetromino()
-	points = 0
-	$Main_panel/Points_lable.text = "Points: " + str(points)
-	$Timer.wait_time = 1;
-	$Timer.start()
-	$Main_panel/Speed_lable.text = "Speed: " + str(round($Timer.wait_time))
-	new_move()
-	$Main_panel/Game_over_panel.visible = false
-	$Main_panel/Start_button.text = "Restart"
 
-func check_game_over():
-	for i in fallen_blocks:
-		if i.position.y == cell_size:
-			$Main_panel/Game_over_panel.visible = true
-			$Timer.stop()
+	next_tetromino = randi_range(0, len(tetromino_coords) - 1)
 
-func new_move():
-	blocks = [0, 0, 0 ,0]
-	matrix_coords = Vector2(matrix_center, cell_size)
+	left_button_pressed = false
+	left_button_pressed_ticks = 0
+	down_button_pressed = false
+	down_button_pressed_ticks = 0
+	right_button_pressed = false
+	right_button_pressed_ticks = 0
 
-func _on_timer_timeout():			
-	if blocks == [0, 0, 0, 0]:		
+	change_interface_size()
+	
+	$PointsLable.text = "Points: " + str(points)
+	$SpeedLable.text = "Speed: " + str(snapped(1 / speed, 0.001))
+
+	$PauseButton.visible = false
+	$GameOverPanel.visible = false
+
+func change_interface_size():
+	const intrface_width = 16
+	const intrface_height = 26
+	const button_size = 2
+	
+	var window_size = get_viewport().size
+	var window_center = Vector2(window_size.x / 2, window_size.y / 2)
+	var interface_scale = float(min(window_size.x / intrface_width, window_size.y / intrface_height)) / cell_size
+
+	$GameField.position = window_center
+	$GameField.scale /= $GameField.scale 
+	$GameField.scale *= interface_scale
+
+	$SpeedLable.position = Vector2(window_center.x - cell_size * interface_scale * 5, window_center.y - cell_size * interface_scale * 11.5)
+	$SpeedLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
+
+	$PointsLable.position = Vector2(window_center.x + cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 11.5)
+	$PointsLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
+
+	$NextTetrominoPicture.position = Vector2(window_center.x - cell_size * interface_scale * button_size / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
+	$NextTetrominoPicture.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$StartButton.position = Vector2(window_center.x - cell_size * interface_scale * (intrface_width - 1) / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
+	$StartButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$PauseButton.position = Vector2(window_center.x - cell_size * interface_scale * (intrface_width - 1) / 2, window_center.y - cell_size * interface_scale * ((intrface_height - 1) / 2 - button_size))
+	$PauseButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$LeftButton.position = Vector2(window_center.x - cell_size * interface_scale * 7, window_center.y + cell_size * interface_scale * 10.5)
+	$LeftButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$TurnButton.position = Vector2(window_center.x - cell_size * interface_scale * 3, window_center.y + cell_size * interface_scale * 10.5)
+	$TurnButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$DownButton.position = Vector2(window_center.x + cell_size * interface_scale, window_center.y + cell_size * interface_scale * 10.5)
+	$DownButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$RightButton.position = Vector2(window_center.x + cell_size * interface_scale * 5, window_center.y + cell_size * interface_scale * 10.5)
+	$RightButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+
+	$GameOverPanel.position = Vector2(window_center.x - cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 2)
+	$GameOverPanel.size = Vector2(cell_size * interface_scale * 4, cell_size * interface_scale * 4)
+
+	$GameOverPanel/GameOverLable.position = Vector2(0, 0)
+	$GameOverPanel/GameOverLable.size = Vector2(cell_size * interface_scale * 4, cell_size * interface_scale * 4)
+
+func _on_game_timer_timeout():
+	if blocks == []:
+		left_button_pressed_ticks = 0
+		down_button_pressed_ticks = 0
+		right_button_pressed_ticks = 0
+
 		blocks_relative_coords = tetromino_coords[new_tetromino()].duplicate()
-		for i in 4:
+
+		blocks = [0, 0, 0, 0]
+		for i in len(blocks_relative_coords):
 			blocks[i] = block.instantiate()
-			$Main_panel/Field.add_child(blocks[i])
+			$GameField.add_child(blocks[i])
+
 		update_coords()
-	else:
+
+	elif down_button_pressed_ticks < max_pressed_ticks:
 		move_down()
 
+func _on_pressed_timer_timeout():
+	if down_button_pressed:
+		if down_button_pressed_ticks >= max_pressed_ticks:
+			move_down()
+		else:
+			down_button_pressed_ticks += 1
+
+	if left_button_pressed:
+		if left_button_pressed_ticks >= max_pressed_ticks:
+			move_left()
+		else:
+			left_button_pressed_ticks += 1
+
+	if right_button_pressed:
+		if right_button_pressed_ticks >= max_pressed_ticks:
+			move_right()
+		else:
+			right_button_pressed_ticks += 1
+
+func restart():
+	if blocks != []:
+		for block in blocks:
+			block.queue_free()
+
+	for fallen_block in fallen_blocks:
+		fallen_block.queue_free()
+
+	_on_ready()
+
+	$PauseButton.visible = true
+
+	$StartButton.text = "Restart"
+
+	no_pause = true
+	$GameTimer.start()
+	$PressedTimer.start()
+
+func pause():
+	if $GameTimer.is_stopped():
+		no_pause = true
+		$GameTimer.start()
+		$PressedTimer.start()
+		$PauseButton.text = "Pause"
+
+	else:
+		no_pause = false
+		$GameTimer.stop()
+		$PressedTimer.stop()
+		$PauseButton.text = "Start"
+
 func new_tetromino():
+	var new_tetromino
+	var present_tetromino
+	
 	while true:
-		var new_tetromino = randi_range(0, len(tetromino_coords) - 1)
+		new_tetromino = randi_range(0, len(tetromino_coords) - 1)
+
 		if new_tetromino != next_tetromino:
-			var present_tetromino = next_tetromino
+			present_tetromino = next_tetromino
 			next_tetromino = new_tetromino
-			$Main_panel/Next_tetromino_texture.texture = load("res://assets/Tetromino%d.png" % next_tetromino)
+
+			$NextTetrominoPicture.texture = load("res://assets/Tetromino%d.png" % next_tetromino)
+
 			return present_tetromino
 
+func add_points(number_filled_lines):
+	var extra_points = 0
+
+	for i in number_filled_lines:
+		extra_points = extra_points * 2 + 100
+
+	points += extra_points
+
+	$PointsLable.text = "Points: " + str(points)
+
+func change_speed(number_filled_lines):
+	speed *= speed_multiplier ** number_filled_lines
+
+	if speed < max_speed:
+		speed = max_speed
+
+	$GameTimer.wait_time = speed
+	$SpeedLable.text = "Speed: " + str(snapped(1 / speed, 0.001))
+
 func update_coords():
-	for i in 4:
+	for i in len(blocks):
 		blocks[i].position = matrix_coords + blocks_relative_coords[i]
 
-func add_points(number_full_lines):
-	var new_points = 0
-	for i in number_full_lines:
-		new_points = new_points * 2 + 100
-	points += new_points
-	$Main_panel/Points_lable.text = "Points: " + str(points)
+func check_game_over():
+	for fallen_block in fallen_blocks:
+		if fallen_block.position.y == -1 * cell_size * (game_field_height / 2 - 1):
+			$PauseButton.visible = false
+			$GameOverPanel.visible = true
 
-func change_speed(number_full_lines):
-	$Timer.wait_time = $Timer.wait_time * (speed_factor ** number_full_lines)
-	$Main_panel/Speed_lable.text = "Speed: " + str(round($Timer.wait_time))
+			no_pause = false
+			$GameTimer.stop()
+			$PressedTimer.stop()
 
-func check_lines():
-	var new_dropped_blocks_coords_y = []
-	var full_lines_indexes = []
-	var full_lines_coords_y = []
-	for i in blocks:
-		if (i.position.y in new_dropped_blocks_coords_y) == false:
-			new_dropped_blocks_coords_y.append(i.position.y)			
-	for i in new_dropped_blocks_coords_y:
-		var line_indexes =[]
-		for e in 10:
-			if fallen_blocks_coords.find(Vector2(e * 64, i)) != -1:
-				line_indexes.append(fallen_blocks_coords.find(Vector2(e * 64, i)))
-		if len(line_indexes) == 10:
-			full_lines_indexes.append_array(line_indexes)
-			full_lines_coords_y.append(i)
-	remove_lines(full_lines_indexes)
-	move_fallen_blocks_down(full_lines_coords_y)
-	var number_full_lines = len(full_lines_coords_y)
-	add_points(number_full_lines)
-	change_speed(number_full_lines)
+func check_filled_lines():
+	var last_blocks_coords_y = []
+	var tested_line_indexes
+	var block_index_in_tested_line
+	var filled_lines_indexes = []
+	var filled_lines_coords_y = []
+	var number_filled_lines
 
-func remove_lines(full_lines_indexes):
-	if full_lines_indexes != []:
-		full_lines_indexes.sort()
-		full_lines_indexes.reverse()
-		for i in full_lines_indexes:
-			fallen_blocks[i].queue_free()
-			fallen_blocks.remove_at(i)
-			fallen_blocks_coords.remove_at(i)
+	for block in blocks:
+		if (block.position.y in last_blocks_coords_y) == false:
+			last_blocks_coords_y.append(block.position.y)
 
-func move_fallen_blocks_down(full_lines_coords_y):
-		full_lines_coords_y.sort()
-		for i in full_lines_coords_y:
-			for e in len(fallen_blocks):
-				if fallen_blocks[e].position.y <= i:
-					fallen_blocks[e].position.y += cell_size
-					fallen_blocks_coords[e].y += cell_size
+	for block_coord_y in last_blocks_coords_y:
+		tested_line_indexes = []
 
-func check_move_down():
-	for i in 4:		
-		var next_coord = blocks[i].position
-		next_coord.y += cell_size
-		if next_coord.y >= bottom_border or next_coord in fallen_blocks_coords:
-			return false		
-	return true
+		for cell in game_field_width:
+			block_index_in_tested_line = fallen_blocks_coords.find(Vector2(left_border + cell * cell_size, block_coord_y))
+			if block_index_in_tested_line != -1:
+				tested_line_indexes.append(block_index_in_tested_line)
 
-func move_down():
-		if check_move_down():
-			matrix_coords.y += cell_size
+		if len(tested_line_indexes) == game_field_width:
+			filled_lines_indexes.append_array(tested_line_indexes)
+			filled_lines_coords_y.append(block_coord_y)
+
+	number_filled_lines = len(filled_lines_coords_y)
+
+	if number_filled_lines != 0:
+		remove_filled_lines(filled_lines_indexes)
+		move_fallen_blocks_down(filled_lines_coords_y)
+
+		add_points(number_filled_lines)
+		change_speed(number_filled_lines)
+
+func remove_filled_lines(filled_lines_indexes):
+	filled_lines_indexes.sort()
+	filled_lines_indexes.reverse()
+
+	for block_index in filled_lines_indexes:
+		fallen_blocks[block_index].queue_free()
+		fallen_blocks.remove_at(block_index)
+		fallen_blocks_coords.remove_at(block_index)
+
+func move_fallen_blocks_down(filled_lines_coords_y):
+	filled_lines_coords_y.sort()
+
+	for full_line_coord_y in filled_lines_coords_y:
+		for i in len(fallen_blocks):
+			if fallen_blocks[i].position.y <= full_line_coord_y:
+				fallen_blocks[i].position.y += cell_size
+				fallen_blocks_coords[i].y += cell_size
+
+func move_left():
+	if blocks != [] and no_pause:
+		if check_move_left():
+			matrix_coords.x -= cell_size
+
 			update_coords()
-		else:
-			for i in 4:
-				fallen_blocks.append(blocks[i])
-				fallen_blocks_coords.append(blocks[i].position)
-			check_lines()
-			new_move()
-			check_game_over()
 
-func check_turn():
-	for i in 4:
-		var next_coord = Vector2(-1 * blocks_relative_coords[i].y, blocks_relative_coords[i].x)
-		next_coord += matrix_coords
-		if next_coord.y > bottom_border or next_coord.x < left_border or next_coord.x > right_border or next_coord in fallen_blocks_coords:
+func check_move_left():
+	var next_coords
+
+	for block in blocks:
+		next_coords = block.position
+		next_coords.x -= cell_size
+
+		if next_coords.x < left_border or next_coords in fallen_blocks_coords:
 			return false
+
 	return true
 
 func turn ():
-	if check_turn():
-		var x = 0
-		for i in 4:
-			x = blocks_relative_coords[i].x
-			blocks_relative_coords[i].x = -1 * blocks_relative_coords[i].y
-			blocks_relative_coords[i].y = x
+	if blocks != [] and no_pause:
+		var next_coords
+
+		if check_turn():
+			for i in len(blocks_relative_coords):
+				next_coords = blocks_relative_coords[i].x
+				blocks_relative_coords[i].x = -1 * blocks_relative_coords[i].y
+				blocks_relative_coords[i].y = next_coords
+
 		update_coords()
 
-func check_move_right():
-	for i in 4:
-		var next_coord = blocks[i].position
-		next_coord.x += cell_size
-		if next_coord.x > right_border or next_coord in fallen_blocks_coords:
+func check_turn():
+	var next_coords
+
+	for block_relative_coord in blocks_relative_coords:
+		next_coords = matrix_coords + Vector2(block_relative_coord.y * -1, block_relative_coord.x)
+
+		if next_coords.x < left_border or next_coords.x > right_border or next_coords.y > bottom_border or next_coords in fallen_blocks_coords:
 			return false
+
+	return true
+
+func move_down():
+	if blocks != [] and no_pause:
+		if check_move_down():
+			matrix_coords.y += cell_size
+
+			update_coords()
+
+		else:
+			fallen_blocks.append_array(blocks)
+			for block in blocks:
+				fallen_blocks_coords.append(block.position)
+
+			check_filled_lines()
+			check_game_over()
+
+			matrix_coords = matrix_center
+			blocks = []
+
+func check_move_down():
+	var next_coords
+
+	for block in blocks:
+		next_coords = block.position
+		next_coords.y += cell_size
+
+		if next_coords.y > bottom_border or next_coords in fallen_blocks_coords:
+			return false	
+
 	return true
 
 func move_right():
-	if check_move_right():
-		matrix_coords.x += cell_size
-		update_coords()
+	if blocks != [] and no_pause:
+		if check_move_right():
+			matrix_coords.x += cell_size
 
-func check_move_left():
-	for i in 4:
-		var next_coord = blocks[i].position
-		next_coord.x -= cell_size
-		if next_coord.x < left_border or next_coord in fallen_blocks_coords:
+			update_coords()
+
+func check_move_right():
+	var next_coords
+
+	for block in blocks:
+		next_coords = block.position
+		next_coords.x += cell_size
+		
+		if next_coords.x > right_border or next_coords in fallen_blocks_coords:
 			return false
+
 	return true
 
-func move_left():
-	if check_move_left():
-		matrix_coords.x -= cell_size
-		update_coords()
+func _on_start_button_pressed():
+	restart()
+
+func _on_pause_button_pressed():
+	pause()
+
+func _on_turn_button_pressed():
+	if blocks != [] and no_pause:
+		turn()
+
+func _on_left_button_button_down():
+	if blocks != [] and no_pause:
+		move_left()
+
+	left_button_pressed = true
+
+func _on_left_button_button_up():
+	left_button_pressed = false
+	left_button_pressed_ticks = 0
+
+func _on_down_button_button_down():
+	if blocks != [] and no_pause:
+		move_down()
+
+	down_button_pressed = true
+
+func _on_down_button_button_up():
+	down_button_pressed = false
+	down_button_pressed_ticks = 0
+
+func _on_right_button_button_down():
+	if blocks != [] and no_pause:
+		move_right()
+
+	right_button_pressed = true
+
+func _on_right_button_button_up():
+	right_button_pressed = false
+	right_button_pressed_ticks = 0
 
 func _input(event):
-	if  blocks != [0, 0, 0, 0]:
-		if Input.is_action_just_pressed("right"):
-			move_right()
+	if blocks != [] and no_pause:
 		if Input.is_action_just_pressed("left"):
 			move_left()
-		if Input.is_action_just_pressed("down"):
-			move_down()
+
 		if Input.is_action_just_pressed("turn"):
 			turn()
 
-func _on_down_button_pressed():
-	if  blocks != [0, 0, 0, 0]:
-		move_down()
+		if Input.is_action_just_pressed("down"):
+			move_down()
 
-func _on_right_button_pressed():
-	if  blocks != [0, 0, 0, 0]:
-		move_right()
-
-func _on_turn_button_pressed():
-	if  blocks != [0, 0, 0, 0]:
-		turn()
-
-func _on_left_button_pressed():
-	if  blocks != [0, 0, 0, 0]:
-		move_left()
-
-func _on_button_pressed():
-	restart_game()
-
+		if Input.is_action_just_pressed("right"):
+			move_right()

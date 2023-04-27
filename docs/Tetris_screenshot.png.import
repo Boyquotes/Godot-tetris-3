@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2v8j6xcad4kn"
-path="res://.godot/imported/BlockColorWhite.png-e60acae40392a26da5a49998267ed570.ctex"
+uid="uid://xrja4ym5vpou"
+path="res://.godot/imported/Tetris_screenshot.png-d28a9e4b80d78706ec3730d8878af6b1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/BlockColorWhite.png"
-dest_files=["res://.godot/imported/BlockColorWhite.png-e60acae40392a26da5a49998267ed570.ctex"]
+source_file="res://docs/Tetris_screenshot.png"
+dest_files=["res://.godot/imported/Tetris_screenshot.png-d28a9e4b80d78706ec3730d8878af6b1.ctex"]
 
 [params]
 
