@@ -2,7 +2,7 @@
 Tetris clone that I made with GDScript.
 
 ## Overview
-![Interface](docs/Tetris_screenshot.png)
+![Interface](docs/Tetris.png)
 
 ## Using
 You can use the buttons or keyboard keys to control the tetromino.
