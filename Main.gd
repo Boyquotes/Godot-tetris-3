@@ -1,6 +1,14 @@
 extends Node2D
 
 @onready var block = preload("res://Block.tscn")
+@onready var blueBlock = preload("res://BlueBlock.tscn")
+@onready var lightBlueBlock = preload("res://LightBlueBlock.tscn")
+@onready var greenBlock = preload("res://GreenBlock.tscn")
+@onready var orangeBlock = preload("res://OrangeBlock.tscn")
+@onready var redBlock = preload("res://RedBlock.tscn")
+@onready var yellowBlock = preload("res://YellowBlock.tscn")
+@onready var purpleBlock = preload("res://PurpleBlock.tscn")
+
 
 const game_field_width = 10
 const game_field_height = 20
@@ -12,14 +20,14 @@ const right_border = cell_size * (game_field_width / 2 - 1)
 const bottom_border = cell_size * (game_field_height / 2 - 1)
 const matrix_center = Vector2(-cell_size, -cell_size * (game_field_height / 2))
 
-const tetromino_I = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size * 2, 0)]
-const tetromino_O = [Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size), Vector2(0, cell_size)]
-const tetromino_T = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, 0)]
-const tetromino_L = [Vector2(-cell_size, cell_size), Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0)]
-const tetromino_J = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size)]
-const tetromino_S = [Vector2(-cell_size, cell_size), Vector2(0, cell_size), Vector2(0, 0), Vector2(cell_size, 0)]
-const tetromino_Z = [Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, cell_size)]
-const tetromino_coords = [tetromino_I, tetromino_O, tetromino_T, tetromino_L, tetromino_J, tetromino_S, tetromino_Z]
+@onready var tetromino_I = [lightBlueBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size * 2, 0)]
+@onready var tetromino_O = [yellowBlock, Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size), Vector2(0, cell_size)]
+@onready var tetromino_T = [purpleBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, 0)]
+@onready var tetromino_L = [orangeBlock, Vector2(-cell_size, cell_size), Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0)]
+@onready var tetromino_J = [blueBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size)]
+@onready var tetromino_S = [greenBlock, Vector2(-cell_size, cell_size), Vector2(0, cell_size), Vector2(0, 0), Vector2(cell_size, 0)]
+@onready var tetromino_Z = [redBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, cell_size)]
+@onready var tetromino_coords = [tetromino_I, tetromino_O, tetromino_T, tetromino_L, tetromino_J, tetromino_S, tetromino_Z]
 
 const speed_multiplier = 0.95
 const max_speed = 0.01
@@ -130,11 +138,12 @@ func _on_game_timer_timeout():
 		down_button_pressed_ticks = 0
 		right_button_pressed_ticks = 0
 
-		blocks_relative_coords = tetromino_coords[new_tetromino()].duplicate()
+		var block_descr = tetromino_coords[new_tetromino()]
+		blocks_relative_coords = block_descr.slice(-4).duplicate()
 
-		blocks = [0, 0, 0, 0]
+		var b = block_descr[0];
+		blocks = [b.instantiate(), b.instantiate(), b.instantiate(), b.instantiate()]
 		for i in len(blocks_relative_coords):
-			blocks[i] = block.instantiate()
 			$GameField.add_child(blocks[i])
 
 		update_coords()
