@@ -1,11 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://dfuv4uof32gi0"]
+[gd_scene load_steps=2 format=3 uid="uid://cg2rgx1o7curi"]
 
-[ext_resource type="Texture2D" uid="uid://bhm7leqija7o0" path="res://assets/BlockWhite.png" id="1_a0beg"]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pbrpp"]
+load_path = "res://.godot/imported/BlockWhite.png-e0105436acd999264d9ef905d328a69d.ctex"
 
 [node name="Node2D" type="Node2D"]
 
 [node name="Block" type="Sprite2D" parent="."]
-texture = ExtResource("1_a0beg")
+texture = SubResource("CompressedTexture2D_pbrpp")
 centered = false
 
 [connection signal="draw" from="Block" to="Block" method="_on_draw"]

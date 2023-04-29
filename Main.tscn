@@ -24,13 +24,13 @@ theme_type_variation = &"HeaderLarge"
 text = "Speed: 1"
 vertical_alignment = 1
 
-[node name="PointsLable" type="Label" parent="."]
+[node name="ScoreLable" type="Label" parent="."]
 offset_left = 480.0
 offset_top = 72.0
 offset_right = 576.0
 offset_bottom = 120.0
 theme_type_variation = &"HeaderLarge"
-text = "Points: 0"
+text = "Score: 0"
 vertical_alignment = 1
 
 [node name="NextTetrominoPicture" type="TextureRect" parent="."]

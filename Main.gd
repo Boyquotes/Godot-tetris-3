@@ -1,14 +1,12 @@
 extends Node2D
 
-@onready var block = preload("res://Block.tscn")
-@onready var blueBlock = preload("res://BlueBlock.tscn")
-@onready var lightBlueBlock = preload("res://LightBlueBlock.tscn")
-@onready var greenBlock = preload("res://GreenBlock.tscn")
-@onready var orangeBlock = preload("res://OrangeBlock.tscn")
-@onready var redBlock = preload("res://RedBlock.tscn")
-@onready var yellowBlock = preload("res://YellowBlock.tscn")
-@onready var purpleBlock = preload("res://PurpleBlock.tscn")
-
+@onready var BlockI = preload("res://BlockI.tscn")
+@onready var BlockO = preload("res://BlockO.tscn")
+@onready var BlockT = preload("res://BlockT.tscn")
+@onready var BlockL = preload("res://BlockL.tscn")
+@onready var BlockJ = preload("res://BlockJ.tscn")
+@onready var BlockS = preload("res://BlockS.tscn")
+@onready var BlockZ = preload("res://BlockZ.tscn")
 
 const game_field_width = 10
 const game_field_height = 20
@@ -20,14 +18,14 @@ const right_border = cell_size * (game_field_width / 2 - 1)
 const bottom_border = cell_size * (game_field_height / 2 - 1)
 const matrix_center = Vector2(-cell_size, -cell_size * (game_field_height / 2))
 
-@onready var tetromino_I = [lightBlueBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size * 2, 0)]
-@onready var tetromino_O = [yellowBlock, Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size), Vector2(0, cell_size)]
-@onready var tetromino_T = [purpleBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, 0)]
-@onready var tetromino_L = [orangeBlock, Vector2(-cell_size, cell_size), Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0)]
-@onready var tetromino_J = [blueBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size)]
-@onready var tetromino_S = [greenBlock, Vector2(-cell_size, cell_size), Vector2(0, cell_size), Vector2(0, 0), Vector2(cell_size, 0)]
-@onready var tetromino_Z = [redBlock, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, cell_size)]
-@onready var tetromino_coords = [tetromino_I, tetromino_O, tetromino_T, tetromino_L, tetromino_J, tetromino_S, tetromino_Z]
+@onready var tetromino_I = [BlockI, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size * 2, 0)]
+@onready var tetromino_O = [BlockO, Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size), Vector2(0, cell_size)]
+@onready var tetromino_T = [BlockT, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, 0)]
+@onready var tetromino_L = [BlockL, Vector2(-cell_size, cell_size), Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0)]
+@onready var tetromino_J = [BlockJ, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(cell_size, 0), Vector2(cell_size, cell_size)]
+@onready var tetromino_S = [BlockS, Vector2(-cell_size, cell_size), Vector2(0, cell_size), Vector2(0, 0), Vector2(cell_size, 0)]
+@onready var tetromino_Z = [BlockZ, Vector2(-cell_size, 0), Vector2(0, 0), Vector2(0, cell_size), Vector2(cell_size, cell_size)]
+@onready var tetromino_info = [tetromino_I, tetromino_O, tetromino_T, tetromino_L, tetromino_J, tetromino_S, tetromino_Z]
 
 const speed_multiplier = 0.95
 const max_speed = 0.01
@@ -44,7 +42,7 @@ var right_button_pressed_ticks
 var speed
 var no_pause
 
-var points
+var score
 
 var matrix_coords
 var blocks
@@ -61,7 +59,7 @@ func _on_ready():
 	$GameTimer.wait_time = speed
 	$PressedTimer.wait_time = pressed_timer_speed
 
-	points = 0
+	score = 0
 
 	matrix_coords = matrix_center
 	blocks = []
@@ -69,7 +67,7 @@ func _on_ready():
 	fallen_blocks = []
 	fallen_blocks_coords = []
 
-	next_tetromino = randi_range(0, len(tetromino_coords) - 1)
+	next_tetromino = randi_range(0, len(tetromino_info) - 1)
 
 	left_button_pressed = false
 	left_button_pressed_ticks = 0
@@ -80,7 +78,7 @@ func _on_ready():
 
 	change_interface_size()
 	
-	$PointsLable.text = "Points: " + str(points)
+	$ScoreLable.text = "Score: " + str(score)
 	$SpeedLable.text = "Speed: " + str(snapped(1 / speed, 0.001))
 
 	$PauseButton.visible = false
@@ -102,8 +100,8 @@ func change_interface_size():
 	$SpeedLable.position = Vector2(window_center.x - cell_size * interface_scale * 5, window_center.y - cell_size * interface_scale * 11.5)
 	$SpeedLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
 
-	$PointsLable.position = Vector2(window_center.x + cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 11.5)
-	$PointsLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
+	$ScoreLable.position = Vector2(window_center.x + cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 11.5)
+	$ScoreLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
 
 	$NextTetrominoPicture.position = Vector2(window_center.x - cell_size * interface_scale * button_size / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
 	$NextTetrominoPicture.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
@@ -134,15 +132,18 @@ func change_interface_size():
 
 func _on_game_timer_timeout():
 	if blocks == []:
+		var tetromino
+		var block_color
+
 		left_button_pressed_ticks = 0
 		down_button_pressed_ticks = 0
 		right_button_pressed_ticks = 0
 
-		var block_descr = tetromino_coords[new_tetromino()]
-		blocks_relative_coords = block_descr.slice(-4).duplicate()
+		tetromino = tetromino_info[new_tetromino()]
+		blocks_relative_coords = tetromino.slice(1).duplicate()
 
-		var b = block_descr[0];
-		blocks = [b.instantiate(), b.instantiate(), b.instantiate(), b.instantiate()]
+		block_color = tetromino[0];
+		blocks = [block_color.instantiate(), block_color.instantiate(), block_color.instantiate(), block_color.instantiate()]
 		for i in len(blocks_relative_coords):
 			$GameField.add_child(blocks[i])
 
@@ -206,7 +207,7 @@ func new_tetromino():
 	var present_tetromino
 	
 	while true:
-		new_tetromino = randi_range(0, len(tetromino_coords) - 1)
+		new_tetromino = randi_range(0, len(tetromino_info) - 1)
 
 		if new_tetromino != next_tetromino:
 			present_tetromino = next_tetromino
@@ -216,15 +217,15 @@ func new_tetromino():
 
 			return present_tetromino
 
-func add_points(number_filled_lines):
-	var extra_points = 0
+func update_score(number_filled_lines):
+	var new_points = 0
 
 	for i in number_filled_lines:
-		extra_points = extra_points * 2 + 100
+		new_points = new_points * 2 + 100
 
-	points += extra_points
+	score += new_points
 
-	$PointsLable.text = "Points: " + str(points)
+	$ScoreLable.text = "Score: " + str(score)
 
 func change_speed(number_filled_lines):
 	speed *= speed_multiplier ** number_filled_lines
@@ -279,7 +280,7 @@ func check_filled_lines():
 		remove_filled_lines(filled_lines_indexes)
 		move_fallen_blocks_down(filled_lines_coords_y)
 
-		add_points(number_filled_lines)
+		update_score(number_filled_lines)
 		change_speed(number_filled_lines)
 
 func remove_filled_lines(filled_lines_indexes):
