@@ -53,7 +53,11 @@ var fallen_blocks_coords
 
 var next_tetromino
 
+var player_name
+
 func _on_ready():
+	player_name = ''
+
 	init()
 
 	restart()
@@ -86,6 +90,7 @@ func init():
 	change_interface_size()
 
 	$GameOverPanel.visible = false
+	$GameOverPanel/InputPanel.visible = true
 
 func change_interface_size():
 	const intrface_width = 16
@@ -267,8 +272,19 @@ func check_game_over():
 			$GameTimer.stop()
 			$PressedTimer.stop()
 
+			add_record_in_table()
+
 			$StartButton.text = "▶"
 			$GameOverPanel.visible = true
+
+			break
+
+func add_record_in_table():
+	if player_name != '':
+		$GameOverPanel/InputPanel.visible = false
+
+		print(player_name)
+		print(score)
 
 func check_filled_lines():
 	var last_blocks_coords_y = []
@@ -467,8 +483,7 @@ func _input(event):
 			move_right()
 
 func _on_input_button_pressed():
-	var name = $GameOverPanel/InputPanel/InputText.text
-	if name != '':
-		print(name)
+	player_name = $GameOverPanel/InputPanel/InputText.text
+	add_record_in_table()
 
 	restart()
