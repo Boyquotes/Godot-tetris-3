@@ -41,6 +41,7 @@ var right_button_pressed_ticks
 
 var speed
 var no_pause
+var game_over
 
 var score
 
@@ -53,8 +54,14 @@ var fallen_blocks_coords
 var next_tetromino
 
 func _on_ready():
+	init()
+
+	restart()
+
+func init():
 	speed = 1
 	no_pause = false
+	game_over = true
 
 	$GameTimer.wait_time = speed
 	$PressedTimer.wait_time = pressed_timer_speed
@@ -77,17 +84,12 @@ func _on_ready():
 	right_button_pressed_ticks = 0
 
 	change_interface_size()
-	
-	$ScoreLable.text = "Score: " + str(score)
-	$SpeedLable.text = "Speed: " + str(snapped(1 / speed, 0.001))
 
-	$PauseButton.visible = false
 	$GameOverPanel.visible = false
 
 func change_interface_size():
 	const intrface_width = 16
 	const intrface_height = 26
-	const button_size = 2
 	
 	var window_size = get_viewport().size
 	var window_center = Vector2(window_size.x / 2, window_size.y / 2)
@@ -98,37 +100,53 @@ func change_interface_size():
 	$GameField.scale *= interface_scale
 
 	$SpeedLable.position = Vector2(window_center.x - cell_size * interface_scale * 5, window_center.y - cell_size * interface_scale * 11.5)
-	$SpeedLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
+	$SpeedLable.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
+	$SpeedLable.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
 
 	$ScoreLable.position = Vector2(window_center.x + cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 11.5)
-	$ScoreLable.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size / 2)
+	$ScoreLable.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
+	$ScoreLable.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
 
-	$NextTetrominoPicture.position = Vector2(window_center.x - cell_size * interface_scale * button_size / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
-	$NextTetrominoPicture.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+	$NextTetrominoPicture.position = Vector2(window_center.x - cell_size * interface_scale, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
+	$NextTetrominoPicture.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
 
 	$StartButton.position = Vector2(window_center.x - cell_size * interface_scale * (intrface_width - 1) / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
-	$StartButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+	$StartButton.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
+	$StartButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
-	$PauseButton.position = Vector2(window_center.x - cell_size * interface_scale * (intrface_width - 1) / 2, window_center.y - cell_size * interface_scale * ((intrface_height - 1) / 2 - button_size))
-	$PauseButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+	$LeftButton.position = Vector2(window_center.x - cell_size * interface_scale * 8, window_center.y - cell_size * interface_scale * 10)
+	$LeftButton.size = Vector2(cell_size * interface_scale * 5, cell_size * interface_scale * 20)
+	$LeftButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
-	$LeftButton.position = Vector2(window_center.x - cell_size * interface_scale * 7, window_center.y + cell_size * interface_scale * 10.5)
-	$LeftButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+	$TurnButton.position = Vector2(window_center.x - cell_size * interface_scale * 3, window_center.y - cell_size * interface_scale * 10)
+	$TurnButton.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 20)
+	$TurnButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
-	$TurnButton.position = Vector2(window_center.x - cell_size * interface_scale * 3, window_center.y + cell_size * interface_scale * 10.5)
-	$TurnButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+	$RightButton.position = Vector2(window_center.x + cell_size * interface_scale * 3, window_center.y - cell_size * interface_scale * 10)
+	$RightButton.size = Vector2(cell_size * interface_scale * 5, cell_size * interface_scale * 20)
+	$RightButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
-	$DownButton.position = Vector2(window_center.x + cell_size * interface_scale, window_center.y + cell_size * interface_scale * 10.5)
-	$DownButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
+	$DownButton.position = Vector2(window_center.x - cell_size * interface_scale * 8, window_center.y + cell_size * interface_scale * 10)
+	$DownButton.size = Vector2(cell_size * interface_scale * 16, cell_size * interface_scale * 3)
+	$DownButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
-	$RightButton.position = Vector2(window_center.x + cell_size * interface_scale * 5, window_center.y + cell_size * interface_scale * 10.5)
-	$RightButton.size = Vector2(cell_size * interface_scale * button_size, cell_size * interface_scale * button_size)
-
-	$GameOverPanel.position = Vector2(window_center.x - cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 2)
-	$GameOverPanel.size = Vector2(cell_size * interface_scale * 4, cell_size * interface_scale * 4)
+	$GameOverPanel.position = Vector2(window_center.x - cell_size * interface_scale * 3, window_center.y - cell_size * interface_scale * 8)
+	$GameOverPanel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
 
 	$GameOverPanel/GameOverLable.position = Vector2(0, 0)
-	$GameOverPanel/GameOverLable.size = Vector2(cell_size * interface_scale * 4, cell_size * interface_scale * 4)
+	$GameOverPanel/GameOverLable.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
+	$GameOverPanel/GameOverLable.add_theme_font_size_override("font_size", cell_size * interface_scale)
+
+	$GameOverPanel/InputPanel.position = Vector2(0, cell_size * interface_scale * 6)
+	$GameOverPanel/InputPanel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
+
+	$GameOverPanel/InputPanel/InputText.position = Vector2(cell_size * interface_scale * 0.5, cell_size * interface_scale)
+	$GameOverPanel/InputPanel/InputText.size = Vector2(cell_size * interface_scale * 5, cell_size * interface_scale * 1)
+	$GameOverPanel/InputPanel/InputText.add_theme_font_size_override("font_size", cell_size * interface_scale * 0.5)
+
+	$GameOverPanel/InputPanel/InputButton.position = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2.5)
+	$GameOverPanel/InputPanel/InputButton.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
+	$GameOverPanel/InputPanel/InputButton.add_theme_font_size_override("font_size", cell_size * interface_scale * 0.5)
 
 func _on_game_timer_timeout():
 	if blocks == []:
@@ -179,13 +197,13 @@ func restart():
 	for fallen_block in fallen_blocks:
 		fallen_block.queue_free()
 
-	_on_ready()
+	init()
 
-	$PauseButton.visible = true
-
-	$StartButton.text = "Restart"
+	$StartButton.text = "❚❚"
 
 	no_pause = true
+	game_over = false
+
 	$GameTimer.start()
 	$PressedTimer.start()
 
@@ -194,13 +212,13 @@ func pause():
 		no_pause = true
 		$GameTimer.start()
 		$PressedTimer.start()
-		$PauseButton.text = "Pause"
+		$StartButton.text = "❚❚"
 
 	else:
 		no_pause = false
 		$GameTimer.stop()
 		$PressedTimer.stop()
-		$PauseButton.text = "Start"
+		$StartButton.text = "▶"
 
 func new_tetromino():
 	var new_tetromino
@@ -243,12 +261,14 @@ func update_coords():
 func check_game_over():
 	for fallen_block in fallen_blocks:
 		if fallen_block.position.y == -1 * cell_size * (game_field_height / 2 - 1):
-			$PauseButton.visible = false
-			$GameOverPanel.visible = true
-
 			no_pause = false
+			game_over = true
+
 			$GameTimer.stop()
 			$PressedTimer.stop()
+
+			$StartButton.text = "▶"
+			$GameOverPanel.visible = true
 
 func check_filled_lines():
 	var last_blocks_coords_y = []
@@ -393,10 +413,10 @@ func check_move_right():
 	return true
 
 func _on_start_button_pressed():
-	restart()
-
-func _on_pause_button_pressed():
-	pause()
+	if game_over:
+		restart()
+	else:
+		pause()
 
 func _on_turn_button_pressed():
 	if blocks != [] and no_pause:
@@ -445,3 +465,10 @@ func _input(event):
 
 		if Input.is_action_just_pressed("right"):
 			move_right()
+
+func _on_input_button_pressed():
+	var name = $GameOverPanel/InputPanel/InputText.text
+	if name != '':
+		print(name)
+
+	restart()
