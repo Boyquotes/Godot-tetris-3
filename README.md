@@ -2,7 +2,7 @@
 Tetris clone that I made with GDScript.
 
 ## Overview
-![Interface](docs/Tetris.PNG)
+![Interface](docs/Interface.PNG)
 
 ## Using
 You can click on the screen to control the tetromino.
