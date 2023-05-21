@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Main.gd" id="1_p8eam"]
 [ext_resource type="Texture2D" uid="uid://ce0dno78ktfes" path="res://assets/GameField.png" id="2_4wlev"]
-[ext_resource type="FontFile" uid="uid://ddkqnkr4iu2om" path="res://assets/fonts/arial.ttf" id="3_epia2"]
+[ext_resource type="FontFile" uid="uid://ddkqnkr4iu2om" path="res://assets/Fonts/arial.ttf" id="3_epia2"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_p8eam")
@@ -123,6 +123,8 @@ offset_right = 195.0
 offset_bottom = 173.0
 theme_override_fonts/font = ExtResource("3_epia2")
 text = "OK"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="GameOverPanel"]
 
 [connection signal="ready" from="." to="." method="_on_ready"]
 [connection signal="timeout" from="GameTimer" to="." method="_on_game_timer_timeout"]
