@@ -63,7 +63,7 @@ offset_right = 432.0
 offset_bottom = 120.0
 expand_mode = 1
 
-[node name="ScoreLable" type="Label" parent="."]
+[node name="ScoreLabel" type="Label" parent="."]
 offset_left = 480.0
 offset_top = 72.0
 offset_right = 573.0
@@ -72,7 +72,7 @@ theme_override_fonts/font = ExtResource("3_epia2")
 text = "Score: 0"
 vertical_alignment = 1
 
-[node name="SpeedLable" type="Label" parent="."]
+[node name="SpeedLabel" type="Label" parent="."]
 offset_left = 192.0
 offset_top = 72.0
 offset_right = 288.0
@@ -87,7 +87,7 @@ offset_top = 338.0
 offset_right = 529.0
 offset_bottom = 529.0
 
-[node name="GameOverLable" type="Label" parent="GameOverPanel"]
+[node name="GameOverLabel" type="Label" parent="GameOverPanel"]
 layout_mode = 0
 offset_left = 4.0
 offset_top = -3.0

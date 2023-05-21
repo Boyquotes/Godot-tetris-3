@@ -104,13 +104,13 @@ func change_interface_size():
 	$GameField.scale /= $GameField.scale 
 	$GameField.scale *= interface_scale
 
-	$SpeedLable.position = Vector2(window_center.x - cell_size * interface_scale * 5, window_center.y - cell_size * interface_scale * 11.5)
-	$SpeedLable.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
-	$SpeedLable.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
+	$SpeedLabel.position = Vector2(window_center.x - cell_size * interface_scale * 5, window_center.y - cell_size * interface_scale * 11.5)
+	$SpeedLabel.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
+	$SpeedLabel.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
 
-	$ScoreLable.position = Vector2(window_center.x + cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 11.5)
-	$ScoreLable.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
-	$ScoreLable.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
+	$ScoreLabel.position = Vector2(window_center.x + cell_size * interface_scale * 2, window_center.y - cell_size * interface_scale * 11.5)
+	$ScoreLabel.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
+	$ScoreLabel.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
 
 	$NextTetrominoPicture.position = Vector2(window_center.x - cell_size * interface_scale, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
 	$NextTetrominoPicture.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
@@ -138,9 +138,9 @@ func change_interface_size():
 	$GameOverPanel.position = Vector2(window_center.x - cell_size * interface_scale * 3, window_center.y - cell_size * interface_scale * 8)
 	$GameOverPanel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
 
-	$GameOverPanel/GameOverLable.position = Vector2(0, 0)
-	$GameOverPanel/GameOverLable.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
-	$GameOverPanel/GameOverLable.add_theme_font_size_override("font_size", cell_size * interface_scale)
+	$GameOverPanel/GameOverLabel.position = Vector2(0, 0)
+	$GameOverPanel/GameOverLabel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
+	$GameOverPanel/GameOverLabel.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
 	$GameOverPanel/InputPanel.position = Vector2(0, cell_size * interface_scale * 6)
 	$GameOverPanel/InputPanel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
@@ -248,7 +248,7 @@ func update_score(number_filled_lines):
 
 	score += new_points
 
-	$ScoreLable.text = "Score: " + str(score)
+	$ScoreLabel.text = "Score: " + str(score)
 
 func change_speed(number_filled_lines):
 	speed *= speed_multiplier ** number_filled_lines
@@ -257,7 +257,7 @@ func change_speed(number_filled_lines):
 		speed = max_speed
 
 	$GameTimer.wait_time = speed
-	$SpeedLable.text = "Speed: " + str(snapped(1 / speed, 0.001))
+	$SpeedLabel.text = "Speed: " + str(snapped(1 / speed, 0.001))
 
 func update_coords():
 	for i in len(blocks):
