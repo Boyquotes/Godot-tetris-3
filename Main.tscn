@@ -124,7 +124,7 @@ offset_bottom = 173.0
 theme_override_fonts/font = ExtResource("3_epia2")
 text = "OK"
 
-[node name="HTTPRequest" type="HTTPRequest" parent="GameOverPanel"]
+[node name="HTTPRequest" type="HTTPRequest" parent="GameOverPanel/InputPanel"]
 
 [connection signal="ready" from="." to="." method="_on_ready"]
 [connection signal="timeout" from="GameTimer" to="." method="_on_game_timer_timeout"]

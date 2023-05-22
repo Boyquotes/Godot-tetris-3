@@ -90,7 +90,7 @@ func init():
 	change_interface_size()
 
 	$GameOverPanel.visible = false
-	$GameOverPanel/InputPanel.visible = false #change on true
+	$GameOverPanel/InputPanel.visible = true
 
 func change_interface_size():
 	const intrface_width = 16
@@ -283,11 +283,8 @@ func add_record_in_table():
 	if player_name != '':
 		$GameOverPanel/InputPanel.visible = false
 
-		$GameOverPanel/HTTPRequest.request("https://neclor.ru/Records?name=%s&score=%d" % [player_name, score], \
+		$GameOverPanel/InputPanel/HTTPRequest.request("https://neclor.ru/Records?name=%s&score=%d" % [player_name, score], \
 			[], HTTPClient.METHOD_POST, '{}')
-
-		print(player_name)
-		print(score)
 
 func check_filled_lines():
 	var last_blocks_coords_y = []
