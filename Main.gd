@@ -90,7 +90,7 @@ func init():
 	change_interface_size()
 
 	$GameOverPanel.visible = false
-	$GameOverPanel/InputPanel.visible = true
+	$GameOverPanel/InputPanel.visible = false #change on true
 
 func change_interface_size():
 	const intrface_width = 16

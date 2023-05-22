@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://d0udvysmco4v1"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_p8eam"]
-[ext_resource type="Texture2D" uid="uid://ce0dno78ktfes" path="res://assets/GameField.png" id="2_4wlev"]
+[ext_resource type="Texture2D" uid="uid://bdjjo1qliesif" path="res://assets/GameField.png" id="2_4wlev"]
 [ext_resource type="FontFile" uid="uid://ddkqnkr4iu2om" path="res://assets/fonts/arial.ttf" id="3_epia2"]
 
 [node name="Node2D" type="Node2D"]
