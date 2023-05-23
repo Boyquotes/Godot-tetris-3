@@ -1,5 +1,6 @@
 # Godot-tetris
 Tetris clone that I made with GDScript.
+You can play it online on https://neclor.ru
 
 ## Overview
 ![Interface](docs/Interface.PNG)
