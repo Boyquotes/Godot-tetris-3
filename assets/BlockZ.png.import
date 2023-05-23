@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bauvepsy5tyh4"
-path="res://.godot/imported/Interface.PNG-f7b38cf69a082005b8b47d4ceeb8435c.ctex"
+uid="uid://1tdi7wv6k4uy"
+path="res://.godot/imported/BlockZ.png-d78a016e3a1fd2079f21ba7a5e4ec3e5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/Interface.PNG"
-dest_files=["res://.godot/imported/Interface.PNG-f7b38cf69a082005b8b47d4ceeb8435c.ctex"]
+source_file="res://assets/BlockZ.png"
+dest_files=["res://.godot/imported/BlockZ.png-d78a016e3a1fd2079f21ba7a5e4ec3e5.ctex"]
 
 [params]
 

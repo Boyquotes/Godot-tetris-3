@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://d0udvysmco4v1"]
+[gd_scene load_steps=4 format=3 uid="uid://d0udvysmco4v1"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_p8eam"]
 [ext_resource type="Texture2D" uid="uid://bdjjo1qliesif" path="res://assets/GameField.png" id="2_4wlev"]
+[ext_resource type="Texture2D" uid="uid://c6wvx2e3ygayv" path="res://assets/PauseButton.png" id="3_ygwdv"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_p8eam")
@@ -9,18 +10,21 @@ script = ExtResource("1_p8eam")
 [node name="GameTimer" type="Timer" parent="."]
 
 [node name="PressedTimer" type="Timer" parent="."]
+wait_time = 0.01
 
 [node name="GameField" type="Sprite2D" parent="."]
 position = Vector2(384, 624)
 scale = Vector2(0.75, 0.75)
 texture = ExtResource("2_4wlev")
 
-[node name="StartButton" type="Button" parent="."]
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 120.0
-offset_bottom = 120.0
-text = "▶"
+[node name="StartTextureButton" type="TextureButton" parent="."]
+offset_left = 17.0
+offset_top = 14.0
+offset_right = 128.0
+offset_bottom = 129.0
+texture_normal = ExtResource("3_ygwdv")
+ignore_texture_size = true
+stretch_mode = 0
 
 [node name="DownButton" type="Button" parent="."]
 offset_left = -1.0
@@ -31,10 +35,10 @@ focus_mode = 0
 flat = true
 
 [node name="LeftButton" type="Button" parent="."]
-offset_left = 1.0
-offset_top = 146.0
-offset_right = 234.0
-offset_bottom = 1102.0
+offset_left = -31.0
+offset_top = 254.0
+offset_right = 202.0
+offset_bottom = 1210.0
 focus_mode = 0
 flat = true
 
@@ -54,13 +58,6 @@ offset_bottom = 1104.0
 focus_mode = 0
 flat = true
 
-[node name="NextTetrominoPicture" type="TextureRect" parent="."]
-offset_left = 336.0
-offset_top = 24.0
-offset_right = 432.0
-offset_bottom = 120.0
-expand_mode = 1
-
 [node name="ScoreLabel" type="Label" parent="."]
 offset_left = 480.0
 offset_top = 72.0
@@ -76,6 +73,20 @@ offset_right = 288.0
 offset_bottom = 120.0
 text = "Speed: 1"
 vertical_alignment = 1
+
+[node name="NextTetrominoPanel" type="Panel" parent="."]
+offset_left = 311.0
+offset_top = 14.0
+offset_right = 449.0
+offset_bottom = 136.0
+
+[node name="NextTetrominoPicture" type="TextureRect" parent="NextTetrominoPanel"]
+layout_mode = 0
+offset_left = -5.0
+offset_top = 99.0
+offset_right = 91.0
+offset_bottom = 195.0
+expand_mode = 1
 
 [node name="GameOverPanel" type="Panel" parent="."]
 offset_left = 241.0
@@ -122,7 +133,7 @@ text = "OK"
 [connection signal="ready" from="." to="." method="_on_ready"]
 [connection signal="timeout" from="GameTimer" to="." method="_on_game_timer_timeout"]
 [connection signal="timeout" from="PressedTimer" to="." method="_on_pressed_timer_timeout"]
-[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="StartTextureButton" to="." method="_on_start_texture_button_pressed"]
 [connection signal="button_down" from="DownButton" to="." method="_on_down_button_button_down"]
 [connection signal="button_up" from="DownButton" to="." method="_on_down_button_button_up"]
 [connection signal="button_down" from="LeftButton" to="." method="_on_left_button_button_down"]

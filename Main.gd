@@ -28,8 +28,6 @@ const matrix_center = Vector2(-cell_size, -cell_size * (game_field_height / 2))
 @onready var tetromino_info = [tetromino_I, tetromino_O, tetromino_T, tetromino_L, tetromino_J, tetromino_S, tetromino_Z]
 
 const speed_multiplier = 0.95
-const max_speed = 0.01
-const pressed_timer_speed = 0.01
 const max_pressed_ticks = 30
 
 var left_button_pressed
@@ -40,7 +38,7 @@ var right_button_pressed
 var right_button_pressed_ticks
 
 var speed
-var no_pause
+var paused
 var game_over
 
 var score
@@ -64,11 +62,10 @@ func _on_ready():
 
 func init():
 	speed = 1
-	no_pause = false
+	paused = true
 	game_over = true
 
 	$GameTimer.wait_time = speed
-	$PressedTimer.wait_time = pressed_timer_speed
 
 	score = 0
 
@@ -91,6 +88,9 @@ func init():
 
 	$GameOverPanel.visible = false
 	$GameOverPanel/InputPanel.visible = true
+	
+	$ScoreLabel.text = "Score: " + str(score)
+	$SpeedLabel.text = "Speed: " + str(snapped(1 / speed, 0.001))
 
 func change_interface_size():
 	const intrface_width = 16
@@ -112,12 +112,9 @@ func change_interface_size():
 	$ScoreLabel.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
 	$ScoreLabel.add_theme_font_size_override("font_size", cell_size * interface_scale / 2)
 
-	$NextTetrominoPicture.position = Vector2(window_center.x - cell_size * interface_scale, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
-	$NextTetrominoPicture.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
-
-	$StartButton.position = Vector2(window_center.x - cell_size * interface_scale * (intrface_width - 1) / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
-	$StartButton.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
-	$StartButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
+	$StartTextureButton.position = Vector2(window_center.x - cell_size * interface_scale * (intrface_width - 1) / 2, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
+	$StartTextureButton.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
+	$StartTextureButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
 
 	$LeftButton.position = Vector2(window_center.x - cell_size * interface_scale * 8, window_center.y - cell_size * interface_scale * 10)
 	$LeftButton.size = Vector2(cell_size * interface_scale * 5, cell_size * interface_scale * 20)
@@ -134,6 +131,12 @@ func change_interface_size():
 	$DownButton.position = Vector2(window_center.x - cell_size * interface_scale * 8, window_center.y + cell_size * interface_scale * 10)
 	$DownButton.size = Vector2(cell_size * interface_scale * 16, cell_size * interface_scale * 3)
 	$DownButton.add_theme_font_size_override("font_size", cell_size * interface_scale)
+
+	$NextTetrominoPanel.position = Vector2(window_center.x - cell_size * interface_scale, window_center.y - cell_size * interface_scale * (intrface_height - 1) / 2)
+	$NextTetrominoPanel.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
+
+	$NextTetrominoPanel/NextTetrominoPicture.position = Vector2(0, 0)
+	$NextTetrominoPanel/NextTetrominoPicture.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2)
 
 	$GameOverPanel.position = Vector2(window_center.x - cell_size * interface_scale * 3, window_center.y - cell_size * interface_scale * 8)
 	$GameOverPanel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
@@ -204,9 +207,9 @@ func restart():
 
 	init()
 
-	$StartButton.text = "❚❚"
+	$StartTextureButton.texture_normal = load("res://assets/PauseButton.png")
 
-	no_pause = true
+	paused = false
 	game_over = false
 
 	$GameTimer.start()
@@ -214,16 +217,16 @@ func restart():
 
 func pause():
 	if $GameTimer.is_stopped():
-		no_pause = true
+		paused = false
 		$GameTimer.start()
 		$PressedTimer.start()
-		$StartButton.text = "❚❚"
+		$StartTextureButton.texture_normal = load("res://assets/PauseButton.png")
 
 	else:
-		no_pause = false
+		paused = true
 		$GameTimer.stop()
 		$PressedTimer.stop()
-		$StartButton.text = "▶"
+		$StartTextureButton.texture_normal = load("res://assets/StartButton.png")
 
 func new_tetromino():
 	var new_tetromino
@@ -236,7 +239,7 @@ func new_tetromino():
 			present_tetromino = next_tetromino
 			next_tetromino = new_tetromino
 
-			$NextTetrominoPicture.texture = load("res://assets/Tetromino%d.png" % next_tetromino)
+			$NextTetrominoPanel/NextTetrominoPicture.texture = load("res://assets/Tetromino%d.png" % next_tetromino)
 
 			return present_tetromino
 
@@ -251,6 +254,8 @@ func update_score(number_filled_lines):
 	$ScoreLabel.text = "Score: " + str(score)
 
 func change_speed(number_filled_lines):
+	const max_speed = 0.01
+
 	speed *= speed_multiplier ** number_filled_lines
 
 	if speed < max_speed:
@@ -266,7 +271,7 @@ func update_coords():
 func check_game_over():
 	for fallen_block in fallen_blocks:
 		if fallen_block.position.y == -1 * cell_size * (game_field_height / 2 - 1):
-			no_pause = false
+			paused = true
 			game_over = true
 
 			$GameTimer.stop()
@@ -274,7 +279,7 @@ func check_game_over():
 
 			add_record_in_table()
 
-			$StartButton.text = "▶"
+			$StartTextureButton.texture_normal = load("res://assets/StartButton.png")
 			$GameOverPanel.visible = true
 
 			break
@@ -338,7 +343,7 @@ func move_fallen_blocks_down(filled_lines_coords_y):
 				fallen_blocks_coords[i].y += cell_size
 
 func move_left():
-	if blocks != [] and no_pause:
+	if blocks != [] and !paused:
 		if check_move_left():
 			matrix_coords.x -= cell_size
 
@@ -357,7 +362,7 @@ func check_move_left():
 	return true
 
 func turn ():
-	if blocks != [] and no_pause:
+	if blocks != [] and !paused:
 		var next_coords
 
 		if check_turn():
@@ -380,7 +385,7 @@ func check_turn():
 	return true
 
 func move_down():
-	if blocks != [] and no_pause:
+	if blocks != [] and !paused:
 		if check_move_down():
 			matrix_coords.y += cell_size
 
@@ -410,7 +415,7 @@ func check_move_down():
 	return true
 
 func move_right():
-	if blocks != [] and no_pause:
+	if blocks != [] and !paused:
 		if check_move_right():
 			matrix_coords.x += cell_size
 
@@ -428,19 +433,17 @@ func check_move_right():
 
 	return true
 
-func _on_start_button_pressed():
+func _on_start_texture_button_pressed():
 	if game_over:
 		restart()
 	else:
 		pause()
 
 func _on_turn_button_pressed():
-	if blocks != [] and no_pause:
-		turn()
+	turn()
 
 func _on_left_button_button_down():
-	if blocks != [] and no_pause:
-		move_left()
+	move_left()
 
 	left_button_pressed = true
 
@@ -449,8 +452,7 @@ func _on_left_button_button_up():
 	left_button_pressed_ticks = 0
 
 func _on_down_button_button_down():
-	if blocks != [] and no_pause:
-		move_down()
+	move_down()
 
 	down_button_pressed = true
 
@@ -459,8 +461,7 @@ func _on_down_button_button_up():
 	down_button_pressed_ticks = 0
 
 func _on_right_button_button_down():
-	if blocks != [] and no_pause:
-		move_right()
+	move_right()
 
 	right_button_pressed = true
 
@@ -469,18 +470,35 @@ func _on_right_button_button_up():
 	right_button_pressed_ticks = 0
 
 func _input(event):
-	if blocks != [] and no_pause:
-		if Input.is_action_just_pressed("left"):
-			move_left()
+	if Input.is_action_just_pressed("left"):
+		move_left()
 
-		if Input.is_action_just_pressed("turn"):
-			turn()
+		left_button_pressed = true
 
-		if Input.is_action_just_pressed("down"):
-			move_down()
+	if Input.is_action_just_released("left"):
+		left_button_pressed = false
+		left_button_pressed_ticks = 0
 
-		if Input.is_action_just_pressed("right"):
-			move_right()
+	if Input.is_action_just_pressed("turn"):
+		turn()
+
+	if Input.is_action_just_pressed("down"):
+		move_down()
+
+		down_button_pressed = true
+
+	if Input.is_action_just_released("down"):
+		down_button_pressed = false
+		down_button_pressed_ticks = 0
+
+	if Input.is_action_just_pressed("right"):
+		move_right()
+
+		right_button_pressed = true
+
+	if Input.is_action_just_released("right"):
+		right_button_pressed = false
+		right_button_pressed_ticks = 0
 
 func _on_input_button_pressed():
 	player_name = $GameOverPanel/InputPanel/InputText.text

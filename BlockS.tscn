@@ -1,11 +1,11 @@
 [gd_scene load_steps=2 format=3 uid="uid://pyfaivbhbcd7"]
 
-[ext_resource type="Texture2D" uid="uid://cr21q2readgoi" path="res://assets/Block5.png" id="1_rfr11"]
+[ext_resource type="Texture2D" uid="uid://brri3rpwjbbc1" path="res://assets/BlockS.png" id="1_0m1dj"]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="Block" type="Sprite2D" parent="."]
-texture = ExtResource("1_rfr11")
+texture = ExtResource("1_0m1dj")
 centered = false
 
 [connection signal="draw" from="Block" to="Block" method="_on_draw"]
