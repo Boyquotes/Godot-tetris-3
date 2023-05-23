@@ -470,6 +470,9 @@ func _on_right_button_button_up():
 	right_button_pressed_ticks = 0
 
 func _input(event):
+	if Input.is_action_just_pressed("pause"):
+		pause()
+
 	if Input.is_action_just_pressed("left"):
 		move_left()
 
