@@ -5,7 +5,7 @@ Tetris clone that I made with GDScript.
 ![Interface](docs/Interface.PNG)
 
 ## Using
-You can click on the screen to control the tetromino.
+You can click on the screen or using keyboard to control the tetromino.
 
 ### Install
 - Download Godot4
