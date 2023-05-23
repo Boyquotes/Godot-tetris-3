@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://d0udvysmco4v1"]
+[gd_scene load_steps=3 format=3 uid="uid://d0udvysmco4v1"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_p8eam"]
 [ext_resource type="Texture2D" uid="uid://bdjjo1qliesif" path="res://assets/GameField.png" id="2_4wlev"]
-[ext_resource type="FontFile" uid="uid://ddkqnkr4iu2om" path="res://assets/fonts/arial.ttf" id="3_epia2"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_p8eam")
@@ -21,7 +20,6 @@ offset_left = 24.0
 offset_top = 24.0
 offset_right = 120.0
 offset_bottom = 120.0
-theme_override_fonts/font = ExtResource("3_epia2")
 text = "▶"
 
 [node name="DownButton" type="Button" parent="."]
@@ -68,7 +66,6 @@ offset_left = 480.0
 offset_top = 72.0
 offset_right = 573.0
 offset_bottom = 120.0
-theme_override_fonts/font = ExtResource("3_epia2")
 text = "Score: 0"
 vertical_alignment = 1
 
@@ -77,7 +74,6 @@ offset_left = 192.0
 offset_top = 72.0
 offset_right = 288.0
 offset_bottom = 120.0
-theme_override_fonts/font = ExtResource("3_epia2")
 text = "Speed: 1"
 vertical_alignment = 1
 
@@ -93,7 +89,6 @@ offset_left = 4.0
 offset_top = -3.0
 offset_right = 295.0
 offset_bottom = 189.0
-theme_override_fonts/font = ExtResource("3_epia2")
 text = "GAME
 OVER"
 horizontal_alignment = 1
@@ -112,7 +107,6 @@ offset_left = 33.0
 offset_top = 45.0
 offset_right = 265.0
 offset_bottom = 94.0
-theme_override_fonts/font = ExtResource("3_epia2")
 placeholder_text = "Input name"
 
 [node name="InputButton" type="Button" parent="GameOverPanel/InputPanel"]
@@ -121,7 +115,6 @@ offset_left = 96.0
 offset_top = 123.0
 offset_right = 195.0
 offset_bottom = 173.0
-theme_override_fonts/font = ExtResource("3_epia2")
 text = "OK"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="GameOverPanel/InputPanel"]
