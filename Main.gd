@@ -87,7 +87,7 @@ func init():
 	change_interface_size()
 
 	$GameOverPanel.visible = false
-	$GameOverPanel/InputPanel.visible = true
+	$GameOverPanel/InputPanel.visible = false
 	
 	$ScoreLabel.text = "Score: " + str(score)
 	$SpeedLabel.text = "Speed: " + str(snapped(1 / speed, 0.001))
@@ -148,9 +148,9 @@ func change_interface_size():
 	$GameOverPanel/InputPanel.position = Vector2(0, cell_size * interface_scale * 6)
 	$GameOverPanel/InputPanel.size = Vector2(cell_size * interface_scale * 6, cell_size * interface_scale * 4)
 
-	$GameOverPanel/InputPanel/InputText.position = Vector2(cell_size * interface_scale * 0.5, cell_size * interface_scale)
-	$GameOverPanel/InputPanel/InputText.size = Vector2(cell_size * interface_scale * 5, cell_size * interface_scale * 1)
-	$GameOverPanel/InputPanel/InputText.add_theme_font_size_override("font_size", cell_size * interface_scale * 0.5)
+	$GameOverPanel/InputPanel/InputLineEdit.position = Vector2(cell_size * interface_scale * 0.5, cell_size * interface_scale)
+	$GameOverPanel/InputPanel/InputLineEdit.size = Vector2(cell_size * interface_scale * 5, cell_size * interface_scale * 1)
+	$GameOverPanel/InputPanel/InputLineEdit.add_theme_font_size_override("font_size", cell_size * interface_scale * 0.5)
 
 	$GameOverPanel/InputPanel/InputButton.position = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale * 2.5)
 	$GameOverPanel/InputPanel/InputButton.size = Vector2(cell_size * interface_scale * 2, cell_size * interface_scale)
@@ -285,11 +285,13 @@ func check_game_over():
 			break
 
 func add_record_in_table():
-	if player_name != '':
-		$GameOverPanel/InputPanel.visible = false
+	if score != 0:
+		if player_name == '':
+			$GameOverPanel/InputPanel.visible = true
 
-		$GameOverPanel/InputPanel/HTTPRequest.request("https://neclor.ru/Records?name=%s&score=%d" % [player_name, score], \
-			[], HTTPClient.METHOD_POST, '{}')
+		else:
+			$GameOverPanel/InputPanel/HTTPRequest.request("https://neclor.ru/Records?name=%s&score=%d" % [player_name, score], \
+				[], HTTPClient.METHOD_POST, '{}')
 
 func check_filled_lines():
 	var last_blocks_coords_y = []

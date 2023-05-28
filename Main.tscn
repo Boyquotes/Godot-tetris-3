@@ -112,12 +112,11 @@ offset_top = 286.0
 offset_right = 292.0
 offset_bottom = 477.0
 
-[node name="InputText" type="TextEdit" parent="GameOverPanel/InputPanel"]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 45.0
-offset_right = 265.0
-offset_bottom = 94.0
+[node name="InputLineEdit" type="LineEdit" parent="GameOverPanel/InputPanel"]
+offset_left = 25.0
+offset_top = 60.0
+offset_right = 257.0
+offset_bottom = 102.0
 placeholder_text = "Input name"
 
 [node name="InputButton" type="Button" parent="GameOverPanel/InputPanel"]
