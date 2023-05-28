@@ -506,7 +506,7 @@ func _input(event):
 		right_button_pressed_ticks = 0
 
 func _on_input_button_pressed():
-	player_name = $GameOverPanel/InputPanel/InputText.text
+	player_name = $GameOverPanel/InputPanel/InputLineEdit.text
 	add_record_in_table()
 
 	restart()

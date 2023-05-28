@@ -113,6 +113,7 @@ offset_right = 292.0
 offset_bottom = 477.0
 
 [node name="InputLineEdit" type="LineEdit" parent="GameOverPanel/InputPanel"]
+layout_mode = 0
 offset_left = 25.0
 offset_top = 60.0
 offset_right = 257.0
