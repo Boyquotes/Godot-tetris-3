@@ -290,8 +290,21 @@ func add_record_in_table():
 			$GameOverPanel/InputPanel.visible = true
 
 		else:
+			$GameOverPanel/InputPanel/HTTPRequest.request_completed.connect(self.http_request_completed)
 			$GameOverPanel/InputPanel/HTTPRequest.request("https://neclor.ru/Records?name=%s&score=%d" % [player_name, score], \
 				[], HTTPClient.METHOD_POST, '{}')
+
+func parse_http_headers(headers: Array) -> Dictionary:
+	var result = {}
+	for header in headers:
+		var parts = header.split(":")
+		if parts.size() >= 2:
+			result[parts[0].strip_edges()] = parts[1]
+	return result
+
+func http_request_completed(result, response_code, headers, body):
+	if response_code != 200:
+		OS.alert(parse_http_headers(headers)['X-Message'])
 
 func check_filled_lines():
 	var last_blocks_coords_y = []
